@@ -23,17 +23,20 @@ def get_wokrload_level(score):
 # MAIN PROGRAM
 # -------------------------
 
-print("================================")
+print("==================================")
 print("       Welcome to NinerLife")
-print("================================")
+print("==================================")
 
 name = input("What is your name? ")
 classes = int(input("How many classes are you taking? "))
 work_hours = float(input("How many hours do you work per week? "))
 assignments = int(input("How many assignments do you have this week? "))
+
 assignment_list=[]
-assignment_name = input("Enter an assignment: ")
-assignment_list.append(assignment_name)
+for i in range (assignments):
+    assignment_name = input("Enter an assignment: ")
+    assignment_list.append(assignment_name)
+
 exams= int(input("How many emaxams do you have this week ? "))
 
 workload_score= calculate_workload(classes,assignments,exams,work_hours)

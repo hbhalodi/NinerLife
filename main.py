@@ -19,7 +19,6 @@ def get_wokrload_level(score):
     else:
         return "High"
 
-
 # -------------------------
 # MAIN PROGRAM
 # -------------------------
@@ -32,11 +31,12 @@ name = input("What is your name? ")
 classes = int(input("How many classes are you taking? "))
 work_hours = float(input("How many hours do you work per week? "))
 assignments = int(input("How many assignments do you have this week? "))
+assignment_list=[]
+assignment_name = input("Enter an assignment: ")
+assignment_list.append(assignment_name)
 exams= int(input("How many emaxams do you have this week ? "))
 
 workload_score= calculate_workload(classes,assignments,exams,work_hours)
-
-
 level=get_wokrload_level(workload_score)
 
 print("\n================================")
@@ -48,6 +48,7 @@ print("\nWelcome,", name)
 print("Classes:", classes)
 print("Work hours:", work_hours)
 print("Assignments:", assignments)
+print("Assignment List:", assignment_list)
 print("Exams:", exams)
 
 
@@ -56,9 +57,7 @@ print("Workload Level:",level)
 
 if level == "Low":
     print("You have a manageable week. Keep up the good work!")
-
 elif level == "Medium":
     print("Your week looks somewhat busy. Make sure you plan your time.")
-
 else:
     print("Your week looks very busy. Consider prioritizing your deadlines.")

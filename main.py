@@ -1,6 +1,9 @@
+from datetime import date
+
 # -------------------------
 # FUNCTIONS
 # -------------------------
+
 
 def calculate_workload(classes,assignments,exams,work_hours):
     score = (
@@ -18,6 +21,64 @@ def get_wokrload_level(score):
         return "Medium"
     else:
         return "High"
+
+def days_until_due(due_date):
+    today = date.today()
+    difference = due_date - today
+
+    return difference.days
+
+def get_deadline_status(days_remaining):
+    if days_remaining < 0:
+        return "Overdue"
+
+    elif days_remaining == 0:
+        return "Due Today"
+
+    elif days_remaining <= 2:
+        return "Due Soon"
+
+    else:
+        return "Upcoming"
+
+def calculate_priority(days_remaining, difficulty):
+    if difficulty == "High":
+        if days_remaining <= 2:
+            return "Critical"
+        elif days_remaining <= 5:
+            return "High"
+        else:
+            return "Medium"
+        
+    elif difficulty == "Medium":
+        if days_remaining <= 2:
+            return "High"
+        elif days_remaining <= 5:
+            return "Medium"
+        else:
+            return "Low"
+
+    elif difficulty == "Low":
+        if days_remaining <= 2:
+            return "Medium"
+        elif days_remaining <= 5:
+            return "Low"
+        else:
+            return "Low"
+
+def display_assignment(assignment):
+    days_remaining = days_until_due(assignment["due"])
+    status = get_deadline_status(days_remaining)
+    priority = calculate_priority(days_remaining, assignment["difficulty"])
+
+    print("\n----------------------")
+    print("Assignment:", assignment["name"])
+    print("Course:", assignment["course"])
+    print("Due:", assignment["due"])
+    print("Days remaining:", days_remaining)
+    print("Difficulty:", assignment["difficulty"])
+    print("Status:", status)
+    print("Priority:", priority)
 
 # -------------------------
 # MAIN PROGRAM
@@ -84,23 +145,35 @@ assignments = [
     {
         "name": "Python Project",
         "course": "ITSC 3155",
-        "due": "Friday",
+        "due": date(2026, 9, 11),
         "difficulty": "High"
     },
     {
         "name": "SQL Homework",
         "course": "ITSC 3160",
-        "due": "Wednesday",
+        "due": date(2026, 9, 9),
         "difficulty": "Medium"
-    }
+    },
+    {
+        "name": "Math Quiz",
+        "course": "MATH 1241",
+        "due": date(2026, 9, 7),
+        "difficulty": "Low"
+    },
+    {
+    "name": "Data Science Homework",
+    "course": "ITSC 3162",
+    "due": date(2026, 9, 17),
+    "difficulty": "High"
+    },
+        {
+        "name": "Old Assignment",
+        "course": "ITSC 2175",
+        "due": date(2026, 9, 5),
+        "difficulty": "High"
+    },
 ]
 
-print("\nAssignment Details:")
-print(assignments)
-print("First Assignment:", assignments[0]["name"])
 
 for assignment in assignments:
-    print("\nAssignment: ",    assignment["name"])
-    print("Course: ", assignment["course"])
-    print("Due: ",assignment["due"])
-    print("Difficulty: ", assignment["difficulty"])
+    display_assignment(assignment)

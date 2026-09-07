@@ -37,7 +37,16 @@ for i in range (assignments):
     assignment_name = input("Enter an assignment: ")
     assignment_list.append(assignment_name)
 
-exams= int(input("How many emaxams do you have this week ? "))
+exams= int(input("How many exams do you have this week ? "))
+
+student = {
+    "name": name,
+    "classes": classes,
+    "work_hours": work_hours,
+    "assignments": assignments,
+    "assignment_list": assignment_list,
+    "exams": exams
+}
 
 workload_score= calculate_workload(classes,assignments,exams,work_hours)
 level=get_wokrload_level(workload_score)
@@ -64,3 +73,9 @@ elif level == "Medium":
     print("Your week looks somewhat busy. Make sure you plan your time.")
 else:
     print("Your week looks very busy. Consider prioritizing your deadlines.")
+
+
+print("\nStudent Information:")
+print(student)
+print("Student Name:", student["name"])
+print("Student Assignments:", student["assignment_list"])

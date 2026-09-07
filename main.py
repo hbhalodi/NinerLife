@@ -1,4 +1,5 @@
-from datetime import date
+from datetime import date, datetime
+
 
 # -------------------------
 # FUNCTIONS
@@ -79,6 +80,49 @@ def display_assignment(assignment):
     print("Difficulty:", assignment["difficulty"])
     print("Status:", status)
     print("Priority:", priority)
+
+def add_assignment(assignments):
+    name = input("Assignment name: ")
+    course = input("Course: ")
+    due_date_input = input("Due date (YYYY-MM-DD): ")
+    due_date = datetime.strptime(due_date_input, "%Y-%m-%d").date()
+    difficulty = input("Difficulty (High/Medium/Low): ")
+
+    assignment = {
+    "name": name,
+    "course": course,
+    "due": due_date,
+    "difficulty": difficulty
+    }
+    assignments.append(assignment)
+    print("Assignment added successfully!")
+
+def display_assignments(assignments):
+    if not assignments:
+        print("No assignments found.")
+    for assignment in assignments:
+        display_assignment(assignment)
+
+def show_high_priority(assignments):
+    for assignment in assignments:
+        days_remaining = days_until_due(assignment["due"])
+        priority = calculate_priority(days_remaining, assignment["difficulty"])
+
+        if priority == "High" or priority == "Critical":
+            display_assignment(assignment)
+
+def remove_assignment(assignments):
+    found = False
+    name = input("Enter the assignment name to remove: ")
+
+    for assignment in assignments:
+        if assignment["name"]==name:
+            assignments.remove(assignment)
+            print("Assignment removed successfully!")
+            found = True
+
+    if not found:
+        print("Assignment not found.")
 
 # -------------------------
 # MAIN PROGRAM
@@ -175,5 +219,9 @@ assignments = [
 ]
 
 
-for assignment in assignments:
-    display_assignment(assignment)
+display_assignments(assignments)
+
+show_high_priority(assignments)
+
+remove_assignment(assignments)
+# add_assignment(assignments)

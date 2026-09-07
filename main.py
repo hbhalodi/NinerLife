@@ -79,3 +79,28 @@ print("\nStudent Information:")
 print(student)
 print("Student Name:", student["name"])
 print("Student Assignments:", student["assignment_list"])
+
+assignments = [
+    {
+        "name": "Python Project",
+        "course": "ITSC 3155",
+        "due": "Friday",
+        "difficulty": "High"
+    },
+    {
+        "name": "SQL Homework",
+        "course": "ITSC 3160",
+        "due": "Wednesday",
+        "difficulty": "Medium"
+    }
+]
+
+print("\nAssignment Details:")
+print(assignments)
+print("First Assignment:", assignments[0]["name"])
+
+for assignment in assignments:
+    print("\nAssignment: ",    assignment["name"])
+    print("Course: ", assignment["course"])
+    print("Due: ",assignment["due"])
+    print("Difficulty: ", assignment["difficulty"])

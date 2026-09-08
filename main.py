@@ -225,3 +225,29 @@ show_high_priority(assignments)
 
 remove_assignment(assignments)
 # add_assignment(assignments)
+
+while True:
+    print("\n===== NinerLife Menu =====")
+    print("1. Display Assignments")
+    print("2. Show High Priority")
+    print("3. Remove Assignment")
+    print("4. Add Assignment")
+    print("5. Exit")
+
+    choice = input("Enter your choice: ")
+
+    if choice == "1":
+        display_assignments(assignments)
+
+    elif choice == "2":
+        show_high_priority(assignments)
+
+    elif choice == "3":
+        remove_assignment(assignments)
+
+    elif choice == "4":
+        add_assignment(assignments)
+
+    elif choice == "5":
+        print("Thank you for using NinerLife!")
+        break

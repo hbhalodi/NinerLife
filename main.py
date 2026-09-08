@@ -1,5 +1,6 @@
 from datetime import date, datetime
-
+import csv
+import os
 
 # -------------------------
 # FUNCTIONS
@@ -87,14 +88,17 @@ def add_assignment(assignments):
     due_date_input = input("Due date (YYYY-MM-DD): ")
     due_date = datetime.strptime(due_date_input, "%Y-%m-%d").date()
     difficulty = input("Difficulty (High/Medium/Low): ")
+    estimated_hours = float(input("Estimated hours: "))
 
     assignment = {
     "name": name,
     "course": course,
     "due": due_date,
-    "difficulty": difficulty
+    "difficulty": difficulty,
+    "estimated_hours": estimated_hours
     }
     assignments.append(assignment)
+    save_assignments(assignments)
     print("Assignment added successfully!")
 
 def display_assignments(assignments):
@@ -118,11 +122,43 @@ def remove_assignment(assignments):
     for assignment in assignments:
         if assignment["name"]==name:
             assignments.remove(assignment)
+            save_assignments(assignments)
             print("Assignment removed successfully!")
             found = True
 
     if not found:
         print("Assignment not found.")
+
+def save_assignments(assignments):
+        with open("assignments.csv", "w", newline="") as file:
+            fieldnames = ["name", "course", "due", "difficulty", "estimated_hours"]
+            writer = csv.DictWriter(file, fieldnames=fieldnames)
+            writer.writeheader()
+            for assignment in assignments:
+                assignment_copy = assignment.copy()
+                assignment_copy["due"] = assignment["due"].isoformat()
+                writer.writerow(assignment_copy)
+
+def load_assignments():
+    if not os.path.exists("assignments.csv"):
+        return []
+    
+    with open("assignments.csv", "r", newline="") as file:
+        reader = csv.DictReader(file)
+        assignments = []
+
+        for row in reader:
+            assignment = {
+                "name": row["name"],
+                "course": row["course"],
+                "due": datetime.strptime(row["due"], "%Y-%m-%d").date(),
+                "difficulty": row["difficulty"],
+                "estimated_hours": float(row["estimated_hours"])
+            }
+
+            assignments.append(assignment)
+
+    return assignments
 
 # -------------------------
 # MAIN PROGRAM
@@ -185,39 +221,7 @@ print(student)
 print("Student Name:", student["name"])
 print("Student Assignments:", student["assignment_list"])
 
-assignments = [
-    {
-        "name": "Python Project",
-        "course": "ITSC 3155",
-        "due": date(2026, 9, 11),
-        "difficulty": "High"
-    },
-    {
-        "name": "SQL Homework",
-        "course": "ITSC 3160",
-        "due": date(2026, 9, 9),
-        "difficulty": "Medium"
-    },
-    {
-        "name": "Math Quiz",
-        "course": "MATH 1241",
-        "due": date(2026, 9, 7),
-        "difficulty": "Low"
-    },
-    {
-    "name": "Data Science Homework",
-    "course": "ITSC 3162",
-    "due": date(2026, 9, 17),
-    "difficulty": "High"
-    },
-        {
-        "name": "Old Assignment",
-        "course": "ITSC 2175",
-        "due": date(2026, 9, 5),
-        "difficulty": "High"
-    },
-]
-
+assignments = load_assignments()
 
 display_assignments(assignments)
 
@@ -251,3 +255,6 @@ while True:
     elif choice == "5":
         print("Thank you for using NinerLife!")
         break
+
+save_assignments(assignments)
+print("Assignments saved!")

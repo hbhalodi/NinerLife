@@ -2,6 +2,7 @@
 
 from .assignment import AssignmentCreate, AssignmentResponse, AssignmentUpdate
 from .course import CourseCreate, CourseResponse, CourseUpdate
+from .dashboard import DashboardSummary, UpcomingAssignment, UpcomingExam
 from .exam import ExamCreate, ExamResponse, ExamUpdate
 
 __all__ = [
@@ -11,7 +12,10 @@ __all__ = [
     "CourseCreate",
     "CourseResponse",
     "CourseUpdate",
+    "DashboardSummary",
     "ExamCreate",
     "ExamResponse",
     "ExamUpdate",
+    "UpcomingAssignment",
+    "UpcomingExam",
 ]

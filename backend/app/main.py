@@ -8,7 +8,12 @@ from fastapi.middleware.cors import CORSMiddleware
 
 
 from .database import create_database_tables
-from .routes import assignments_router, courses_router, exams_router
+from .routes import (
+    assignments_router,
+    courses_router,
+    dashboard_router,
+    exams_router,
+)
 
 
 @asynccontextmanager
@@ -38,6 +43,7 @@ app.add_middleware(
 
 app.include_router(assignments_router)
 app.include_router(courses_router)
+app.include_router(dashboard_router)
 app.include_router(exams_router)
 
 

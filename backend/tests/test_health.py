@@ -1,5 +1,6 @@
 """Basic endpoint tests for the NinerLife API foundation."""
 
+import pytest
 from fastapi.testclient import TestClient
 
 from backend.app.main import app
@@ -37,3 +38,36 @@ def test_health_check_does_not_allow_unknown_origin() -> None:
 
     assert response.status_code == 200
     assert "access-control-allow-origin" not in response.headers
+
+
+@pytest.mark.parametrize("method", ["GET", "POST", "PUT", "DELETE"])
+def test_cors_preflight_allows_frontend_crud_methods(method: str) -> None:
+    """The local Vite frontend should be able to use each CRUD method."""
+    response = client.options(
+        "/courses",
+        headers={
+            "Origin": "http://127.0.0.1:5173",
+            "Access-Control-Request-Method": method,
+            "Access-Control-Request-Headers": "Content-Type",
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.headers["access-control-allow-origin"] == (
+        "http://127.0.0.1:5173"
+    )
+    assert method in response.headers["access-control-allow-methods"].split(", ")
+    assert "Content-Type" in response.headers["access-control-allow-headers"]
+
+
+def test_cors_preflight_rejects_unneeded_method() -> None:
+    """CORS should not permit methods outside the frontend CRUD contract."""
+    response = client.options(
+        "/courses",
+        headers={
+            "Origin": "http://localhost:5173",
+            "Access-Control-Request-Method": "PATCH",
+        },
+    )
+
+    assert response.status_code == 400

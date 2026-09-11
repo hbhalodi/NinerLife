@@ -7,7 +7,7 @@ from fastapi import FastAPI
 
 
 from .database import create_database_tables
-from .routes import assignments_router
+from .routes import assignments_router, courses_router
 
 
 @asynccontextmanager
@@ -25,6 +25,7 @@ app = FastAPI(
 )
 
 app.include_router(assignments_router)
+app.include_router(courses_router)
 
 
 @app.get("/")

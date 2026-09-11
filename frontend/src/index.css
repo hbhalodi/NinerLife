@@ -492,6 +492,184 @@ a {
   gap: 0.35rem;
 }
 
+.study-plan-controls,
+.study-plan-summary,
+.study-plan-panel {
+  border: 1px solid #d9e2dc;
+  border-radius: 1rem;
+  background: #ffffff;
+  box-shadow: 0 0.7rem 2rem rgb(31 60 46 / 5%);
+}
+
+.study-plan-controls {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 1.35rem;
+}
+
+.study-plan-controls h2 {
+  margin: 0.35rem 0 0;
+  color: #193328;
+  font-size: 1.2rem;
+}
+
+.study-plan-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(9rem, 1fr)) auto;
+  align-items: end;
+  gap: 0.8rem;
+}
+
+.study-plan-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  overflow: hidden;
+  background: #dce5df;
+}
+
+.study-plan-summary > div {
+  display: grid;
+  gap: 0.35rem;
+  padding: 1.1rem 1.25rem;
+  background: #ffffff;
+}
+
+.study-plan-summary span {
+  color: #5d7469;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.study-plan-summary strong {
+  color: #0b5737;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.study-plan-panel {
+  min-width: 0;
+  padding: 1.35rem;
+}
+
+.study-plan-list {
+  display: grid;
+  gap: 0.9rem;
+  margin: 1rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.study-plan-item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.8rem;
+  padding: 1rem;
+  border: 1px solid #dbe4de;
+  border-radius: 0.85rem;
+  background: #fbfcfb;
+}
+
+.study-plan-order {
+  width: 2rem;
+  height: 2rem;
+  display: grid;
+  place-items: center;
+  border-radius: 0.6rem;
+  color: #075d34;
+  background: #e8f5ed;
+  font-size: 0.875rem;
+  font-weight: 850;
+}
+
+.plan-item-type {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.6rem;
+  border: 1px solid;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.plan-item-type-assignment {
+  color: #075d34;
+  border-color: #b6d9c4;
+  background: #eaf7ef;
+}
+
+.plan-item-type-exam {
+  color: #735d18;
+  border-color: #eadb9e;
+  background: #fff7df;
+}
+
+.study-plan-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr));
+  gap: 0.65rem;
+  margin: 1rem 0;
+}
+
+.study-plan-details > div {
+  min-width: 0;
+  padding: 0.65rem;
+  border-radius: 0.6rem;
+  background: #f1f5f2;
+}
+
+.study-plan-details dt {
+  color: #6d7f76;
+  font-size: 0.72rem;
+  font-weight: 750;
+}
+
+.study-plan-details dd {
+  margin: 0.3rem 0 0;
+  overflow-wrap: anywhere;
+  color: #243d32;
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.study-plan-reasons {
+  padding-top: 0.9rem;
+  border-top: 1px solid #e2e9e4;
+}
+
+.study-plan-reasons h4 {
+  margin: 0;
+  color: #51685d;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.study-plan-reasons ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin: 0.6rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.study-plan-reasons li {
+  padding: 0.3rem 0.5rem;
+  border-radius: 999px;
+  color: #496157;
+  background: #edf2ee;
+  font-size: 0.78rem;
+  font-weight: 650;
+}
+
 .dashboard-card,
 .empty-panel,
 .next-step-panel {
@@ -1118,6 +1296,23 @@ a {
   .workload-panel {
     grid-template-columns: 1fr;
   }
+
+  .study-plan-controls {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .study-plan-form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .study-plan-form .button {
+    grid-column: 1 / -1;
+  }
+
+  .study-plan-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 600px) {
@@ -1155,6 +1350,19 @@ a {
 
   .dashboard-upcoming-labels {
     justify-content: flex-start;
+  }
+
+  .study-plan-form,
+  .study-plan-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .study-plan-form .button {
+    grid-column: auto;
+  }
+
+  .study-plan-item {
+    grid-template-columns: 1fr;
   }
 
   .empty-panel {

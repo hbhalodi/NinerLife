@@ -8,6 +8,13 @@ from .prioritization import (
     get_deadline_status,
     normalize_difficulty,
 )
+from .study_planner import (
+    build_study_plan,
+    calculate_planner_score,
+    get_difficulty_score,
+    get_type_score,
+    get_urgency_score,
+)
 from .workload import (
     build_dashboard_summary,
     calculate_workload_score,
@@ -17,11 +24,16 @@ from .workload import (
 __all__ = [
     "build_assignment_insight",
     "build_dashboard_summary",
+    "build_study_plan",
+    "calculate_planner_score",
     "calculate_priority",
     "calculate_workload_score",
     "days_until_due",
     "get_assignment_insights",
     "get_deadline_status",
+    "get_difficulty_score",
+    "get_type_score",
+    "get_urgency_score",
     "get_workload_level",
     "normalize_difficulty",
 ]

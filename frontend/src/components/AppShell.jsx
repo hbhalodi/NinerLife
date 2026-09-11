@@ -7,6 +7,7 @@ const navigationItems = [
   { label: "Assignments", path: "/assignments", shortLabel: "AS" },
   { label: "Courses", path: "/courses", shortLabel: "CO" },
   { label: "Exams", path: "/exams", shortLabel: "EX" },
+  { label: "Study Plan", path: "/study-plan", shortLabel: "SP" },
 ];
 
 const pageTitles = {
@@ -14,6 +15,7 @@ const pageTitles = {
   "/assignments": "Assignments",
   "/courses": "Courses",
   "/exams": "Exams",
+  "/study-plan": "Study plan",
 };
 
 export default function AppShell() {

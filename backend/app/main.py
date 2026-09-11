@@ -13,6 +13,7 @@ from .routes import (
     courses_router,
     dashboard_router,
     exams_router,
+    study_plan_router,
 )
 
 
@@ -45,6 +46,7 @@ app.include_router(assignments_router)
 app.include_router(courses_router)
 app.include_router(dashboard_router)
 app.include_router(exams_router)
+app.include_router(study_plan_router)
 
 
 @app.get("/")

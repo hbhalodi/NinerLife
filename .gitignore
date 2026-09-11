@@ -1,0 +1,9 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Local NinerLife SQLite database files
+backend/ninerlife.db
+backend/ninerlife.db-journal
+backend/ninerlife.db-shm
+backend/ninerlife.db-wal

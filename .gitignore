@@ -7,3 +7,11 @@ backend/ninerlife.db
 backend/ninerlife.db-journal
 backend/ninerlife.db-shm
 backend/ninerlife.db-wal
+
+# React/Vite frontend generated and local-only files
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.local
+frontend/.env.*.local
+frontend/npm-debug.log*

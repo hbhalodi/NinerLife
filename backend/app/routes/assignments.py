@@ -6,7 +6,13 @@ from sqlalchemy.orm import Session
 
 from ..database import get_db
 from ..models import Assignment, Course
-from ..schemas import AssignmentCreate, AssignmentResponse, AssignmentUpdate
+from ..schemas import (
+    AssignmentCreate,
+    AssignmentInsight,
+    AssignmentResponse,
+    AssignmentUpdate,
+)
+from ..services import get_assignment_insights as build_assignment_insights
 
 router = APIRouter(prefix="/assignments", tags=["assignments"])
 
@@ -59,6 +65,20 @@ def get_assignments(
         select(Assignment).order_by(Assignment.id)
     ).all()
     return list(assignments)
+
+
+@router.get("/insights", response_model=list[AssignmentInsight])
+def get_assignment_insights(
+    database_session: Session = Depends(get_db),
+) -> list[AssignmentInsight]:
+    """Return read-only deadline and priority insights for every assignment."""
+    try:
+        return build_assignment_insights(database_session)
+    except ValueError as error:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+            detail=str(error),
+        ) from error
 
 
 @router.get("/{assignment_id}", response_model=AssignmentResponse)

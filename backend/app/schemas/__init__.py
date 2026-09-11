@@ -2,11 +2,14 @@
 
 from .assignment import AssignmentCreate, AssignmentResponse, AssignmentUpdate
 from .course import CourseCreate, CourseResponse, CourseUpdate
-from .dashboard import DashboardSummary, UpcomingAssignment, UpcomingExam
+from .dashboard import DashboardSummary, UpcomingExam
 from .exam import ExamCreate, ExamResponse, ExamUpdate
+from .insights import AssignmentInsight, AssignmentInsightCourse
 
 __all__ = [
     "AssignmentCreate",
+    "AssignmentInsight",
+    "AssignmentInsightCourse",
     "AssignmentResponse",
     "AssignmentUpdate",
     "CourseCreate",
@@ -16,6 +19,5 @@ __all__ = [
     "ExamCreate",
     "ExamResponse",
     "ExamUpdate",
-    "UpcomingAssignment",
     "UpcomingExam",
 ]

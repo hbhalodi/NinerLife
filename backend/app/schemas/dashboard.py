@@ -5,27 +5,7 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-
-class DashboardCourse(BaseModel):
-    """Course identity included with an upcoming dashboard record."""
-
-    model_config = ConfigDict(from_attributes=True)
-
-    id: int
-    name: str
-    code: str
-
-
-class UpcomingAssignment(BaseModel):
-    """An incomplete assignment in the dashboard's weekly window."""
-
-    model_config = ConfigDict(from_attributes=True)
-
-    id: int
-    name: str
-    due: date
-    difficulty: str
-    course: DashboardCourse
+from .insights import AssignmentInsight, AssignmentInsightCourse
 
 
 class UpcomingExam(BaseModel):
@@ -37,7 +17,7 @@ class UpcomingExam(BaseModel):
     name: str
     exam_date: date
     difficulty: str
-    course: DashboardCourse
+    course: AssignmentInsightCourse
 
 
 class DashboardSummary(BaseModel):
@@ -52,5 +32,5 @@ class DashboardSummary(BaseModel):
     work_hours: float = Field(ge=0)
     window_start: date
     window_end: date
-    upcoming_assignments: list[UpcomingAssignment]
+    upcoming_assignments: list[AssignmentInsight]
     upcoming_exams: list[UpcomingExam]

@@ -7,7 +7,7 @@ import { getErrorMessage } from "../services/api";
 import {
   createAssignment,
   deleteAssignment,
-  getAssignments,
+  getAssignmentInsights,
   updateAssignment,
 } from "../services/assignments";
 import { getCourses } from "../services/courses";
@@ -44,7 +44,7 @@ export default function AssignmentsPage() {
     const requestController = new AbortController();
 
     Promise.all([
-      getAssignments(requestController.signal),
+      getAssignmentInsights(requestController.signal),
       getCourses(requestController.signal),
     ])
       .then(([assignmentData, courseData]) => {
@@ -63,13 +63,9 @@ export default function AssignmentsPage() {
     return () => requestController.abort();
   }, []);
 
-  const courseNames = new Map(
-    courses.map((course) => [course.id, `${course.code} — ${course.name}`]),
-  );
-
   async function refreshData() {
     const [assignmentData, courseData] = await Promise.all([
-      getAssignments(),
+      getAssignmentInsights(),
       getCourses(),
     ]);
     setAssignments(assignmentData);
@@ -345,8 +341,7 @@ export default function AssignmentsPage() {
                   <div className="record-card-heading">
                     <div>
                       <p className="record-context">
-                        {courseNames.get(assignment.course_id) ??
-                          `Course #${assignment.course_id}`}
+                        {assignment.course.code} — {assignment.course.name}
                       </p>
                       <h3>{assignment.name}</h3>
                     </div>
@@ -359,7 +354,7 @@ export default function AssignmentsPage() {
                     </span>
                   </div>
 
-                  <dl className="record-details">
+                  <dl className="record-details assignment-insight-details">
                     <div>
                       <dt>Due</dt>
                       <dd>{formatDate(assignment.due)}</dd>
@@ -369,6 +364,26 @@ export default function AssignmentsPage() {
                       <dd>
                         <span className={`difficulty difficulty-${assignment.difficulty.toLowerCase()}`}>
                           {assignment.difficulty}
+                        </span>
+                      </dd>
+                    </div>
+                    <div>
+                      <dt>Deadline</dt>
+                      <dd>
+                        <span
+                          className={`deadline-status deadline-status-${assignment.deadline_status.toLowerCase().replaceAll(" ", "-")}`}
+                        >
+                          {assignment.deadline_status}
+                        </span>
+                      </dd>
+                    </div>
+                    <div>
+                      <dt>Priority</dt>
+                      <dd>
+                        <span
+                          className={`priority-badge priority-${assignment.priority.toLowerCase()}`}
+                        >
+                          {assignment.priority}
                         </span>
                       </dd>
                     </div>

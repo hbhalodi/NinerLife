@@ -9,9 +9,9 @@ from sqlalchemy.orm import Session, joinedload
 from ..models import Assignment, Course, Exam
 from ..schemas.dashboard import (
     DashboardSummary,
-    UpcomingAssignment,
     UpcomingExam,
 )
+from .prioritization import build_assignment_insight
 
 WorkloadLevel = Literal["Low", "Medium", "High"]
 
@@ -104,7 +104,7 @@ def build_dashboard_summary(
         window_start=window_start,
         window_end=window_end,
         upcoming_assignments=[
-            UpcomingAssignment.model_validate(assignment)
+            build_assignment_insight(assignment, window_start)
             for assignment in upcoming_assignments
         ],
         upcoming_exams=[

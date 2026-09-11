@@ -58,11 +58,23 @@ function UpcomingList({ type, records }) {
                 </div>
                 <div className="dashboard-upcoming-meta">
                   <time dateTime={dateValue}>{formatDate(dateValue)}</time>
-                  <span
-                    className={`difficulty difficulty-${record.difficulty.toLowerCase()}`}
-                  >
-                    {record.difficulty}
-                  </span>
+                  <div className="dashboard-upcoming-labels">
+                    <span
+                      className={`deadline-status deadline-status-${record.deadline_status.toLowerCase().replaceAll(" ", "-")}`}
+                    >
+                      {record.deadline_status}
+                    </span>
+                    <span
+                      className={`priority-badge priority-${record.priority.toLowerCase()}`}
+                    >
+                      {record.priority}
+                    </span>
+                    <span
+                      className={`difficulty difficulty-${record.difficulty.toLowerCase()}`}
+                    >
+                      {record.difficulty}
+                    </span>
+                  </div>
                 </div>
               </article>
             );

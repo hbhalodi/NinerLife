@@ -4,6 +4,10 @@ export function getAssignments(signal) {
   return apiRequest("/assignments", { signal });
 }
 
+export function getAssignmentInsights(signal) {
+  return apiRequest("/assignments/insights", { signal });
+}
+
 export function createAssignment(assignment) {
   return apiRequest("/assignments", { method: "POST", body: assignment });
 }

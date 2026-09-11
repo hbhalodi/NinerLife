@@ -485,6 +485,13 @@ a {
   font-weight: 700;
 }
 
+.dashboard-upcoming-labels {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.35rem;
+}
+
 .dashboard-card,
 .empty-panel,
 .next-step-panel {
@@ -958,6 +965,46 @@ a {
   padding: 0.2rem 0.45rem;
 }
 
+.deadline-status,
+.priority-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.45rem;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.deadline-status-overdue,
+.deadline-status-due-today,
+.priority-critical {
+  color: #8a3328;
+  border-color: #edc2bb;
+  background: #fff0ed;
+}
+
+.deadline-status-due-soon,
+.priority-high {
+  color: #735d18;
+  border-color: #eadb9e;
+  background: #fff7df;
+}
+
+.deadline-status-upcoming,
+.priority-medium {
+  color: #0b6a42;
+  border-color: #b9dbc7;
+  background: #edf8f1;
+}
+
+.priority-low {
+  color: #496157;
+  border-color: #d7e0da;
+  background: #f4f7f5;
+}
+
 .difficulty-low {
   color: #12603c;
   background: #dff3e7;
@@ -1104,6 +1151,10 @@ a {
 
   .dashboard-upcoming-meta {
     justify-items: start;
+  }
+
+  .dashboard-upcoming-labels {
+    justify-content: flex-start;
   }
 
   .empty-panel {

@@ -5,7 +5,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from ..database import get_db
-from ..models import Assignment, Course
+from ..models import Assignment, Course, Exam
 from ..schemas import CourseCreate, CourseResponse, CourseUpdate
 
 router = APIRouter(prefix="/courses", tags=["courses"])
@@ -125,7 +125,7 @@ def delete_course(
     course_id: int,
     database_session: Session = Depends(get_db),
 ) -> Response:
-    """Delete an empty course while protecting linked assignments."""
+    """Delete an empty Course while protecting linked academic work."""
     course = get_course_or_404(course_id, database_session)
     linked_assignment_id = database_session.scalar(
         select(Assignment.id)
@@ -138,6 +138,18 @@ def delete_course(
             detail=(
                 f"Course with id {course_id} cannot be deleted while it has "
                 "Assignments. Remove or reassign them first."
+            ),
+        )
+
+    linked_exam_id = database_session.scalar(
+        select(Exam.id).where(Exam.course_id == course.id).limit(1)
+    )
+    if linked_exam_id is not None:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=(
+                f"Course with id {course_id} cannot be deleted while it has "
+                "Exams. Remove or reassign them first."
             ),
         )
 

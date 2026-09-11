@@ -2,6 +2,7 @@
 
 from .assignment import AssignmentCreate, AssignmentResponse, AssignmentUpdate
 from .course import CourseCreate, CourseResponse, CourseUpdate
+from .exam import ExamCreate, ExamResponse, ExamUpdate
 
 __all__ = [
     "AssignmentCreate",
@@ -10,4 +11,7 @@ __all__ = [
     "CourseCreate",
     "CourseResponse",
     "CourseUpdate",
+    "ExamCreate",
+    "ExamResponse",
+    "ExamUpdate",
 ]

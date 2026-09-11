@@ -9,7 +9,7 @@ from sqlalchemy import Engine, create_engine, inspect, select
 from sqlalchemy.orm import Session, sessionmaker
 
 from backend.app.database import create_database_tables
-from backend.app.models import Assignment, Course
+from backend.app.models import Assignment, Course, Exam
 
 
 @pytest.fixture
@@ -35,12 +35,13 @@ def temporary_database(
 def test_database_tables_can_be_created(
     temporary_database: tuple[Session, Engine],
 ) -> None:
-    """Both Phase 2 tables should be present in a temporary database."""
+    """All current model tables should be present in a temporary database."""
     _, test_engine = temporary_database
 
     assert set(inspect(test_engine).get_table_names()) == {
         "assignments",
         "courses",
+        "exams",
     }
 
 
@@ -70,3 +71,31 @@ def test_assignment_can_be_linked_to_its_course(
     assert saved_assignment.course is saved_course
     assert saved_course.assignments == [saved_assignment]
     assert saved_assignment.completed is False
+
+
+def test_exam_can_be_linked_to_its_course(
+    temporary_database: tuple[Session, Engine],
+) -> None:
+    """A Course should expose its Exams and each Exam should expose its Course."""
+    database_session, _ = temporary_database
+    course = Course(name="Database Design", code="ITSC 3160")
+    exam = Exam(
+        name="Midterm Exam",
+        course=course,
+        exam_date=date(2026, 10, 10),
+        difficulty="High",
+        estimated_study_hours=8.0,
+    )
+
+    database_session.add(exam)
+    database_session.commit()
+
+    saved_course = database_session.scalar(select(Course))
+    saved_exam = database_session.scalar(select(Exam))
+
+    assert saved_course is not None
+    assert saved_exam is not None
+    assert saved_exam.course_id == saved_course.id
+    assert saved_exam.course is saved_course
+    assert saved_course.exams == [saved_exam]
+    assert saved_exam.completed is False

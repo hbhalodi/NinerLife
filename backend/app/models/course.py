@@ -9,6 +9,7 @@ from ..database import Base
 
 if TYPE_CHECKING:
     from .assignment import Assignment
+    from .exam import Exam
 
 
 class Course(Base):
@@ -21,6 +22,10 @@ class Course(Base):
     code: Mapped[str] = mapped_column(String(50), nullable=False, index=True)
 
     assignments: Mapped[list["Assignment"]] = relationship(
+        back_populates="course",
+        cascade="all, delete-orphan",
+    )
+    exams: Mapped[list["Exam"]] = relationship(
         back_populates="course",
         cascade="all, delete-orphan",
     )

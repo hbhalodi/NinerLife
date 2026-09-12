@@ -8,6 +8,11 @@ backend/ninerlife.db-journal
 backend/ninerlife.db-shm
 backend/ninerlife.db-wal
 
+# Backend environment files can contain production database credentials
+backend/.env
+backend/.env.local
+backend/.env.*.local
+
 # React/Vite frontend generated and local-only files
 frontend/node_modules/
 frontend/dist/

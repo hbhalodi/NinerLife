@@ -7,8 +7,13 @@ export default function Notice({ type = "error", message }) {
     <div
       className={`notice notice-${type}`}
       role={type === "error" ? "alert" : "status"}
+      aria-atomic="true"
+      aria-live={type === "error" ? "assertive" : "polite"}
     >
-      {message}
+      <strong className="notice-label">
+        {type === "error" ? "Action needed:" : "Saved:"}
+      </strong>
+      <span>{message}</span>
     </div>
   );
 }

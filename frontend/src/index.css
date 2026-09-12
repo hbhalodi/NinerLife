@@ -48,6 +48,31 @@ a {
   color: inherit;
 }
 
+:focus-visible {
+  outline: 3px solid #d59f00;
+  outline-offset: 3px;
+}
+
+.skip-link {
+  position: fixed;
+  z-index: 10;
+  top: 0.75rem;
+  left: 0.75rem;
+  padding: 0.7rem 0.9rem;
+  border-radius: 0.65rem;
+  color: #10231a;
+  background: #f4c95d;
+  box-shadow: 0 0.5rem 1.5rem rgb(16 35 26 / 20%);
+  font-weight: 800;
+  text-decoration: none;
+  transform: translateY(-160%);
+  transition: transform 160ms ease;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
 .app-shell {
   min-height: 100vh;
   display: grid;
@@ -255,6 +280,10 @@ a {
 
 .main-content {
   padding: clamp(2rem, 5vw, 4.5rem) clamp(1.25rem, 4vw, 3.5rem);
+}
+
+.main-content:focus {
+  outline: none;
 }
 
 .page-stack {
@@ -813,12 +842,19 @@ a {
 }
 
 .notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.45rem;
   padding: 0.9rem 1rem;
   border: 1px solid;
   border-radius: 0.75rem;
   font-size: 0.9375rem;
   font-weight: 650;
   line-height: 1.5;
+}
+
+.notice-label {
+  flex: 0 0 auto;
 }
 
 .notice-error {
@@ -926,6 +962,11 @@ a {
   box-shadow: 0 0 0 0.2rem rgb(22 132 82 / 13%);
 }
 
+.form-field input:user-invalid,
+.form-field select:user-invalid {
+  border-color: #b64134;
+}
+
 .checkbox-field {
   display: flex;
   align-items: center;
@@ -965,6 +1006,10 @@ a {
 
 .button:hover:not(:disabled) {
   transform: translateY(-1px);
+}
+
+.button:active:not(:disabled) {
+  transform: translateY(0);
 }
 
 .button:focus-visible {
@@ -1395,6 +1440,64 @@ a {
 
   .record-actions .button {
     flex: 1 1 auto;
+  }
+}
+
+@media (max-width: 420px) {
+  .main-content {
+    padding: 1.25rem 1rem 2rem;
+  }
+
+  .page-stack {
+    gap: 1.25rem;
+  }
+
+  .topbar,
+  .resource-form-panel,
+  .resource-list-panel,
+  .dashboard-upcoming-panel,
+  .study-plan-controls,
+  .study-plan-panel,
+  .workload-panel {
+    padding: 1rem;
+  }
+
+  .dashboard-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-metric-card p {
+    min-height: auto;
+  }
+
+  .resource-count,
+  .backend-status {
+    max-width: 100%;
+  }
+
+  .notice {
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+}
+
+@media (prefers-contrast: more) {
+  .resource-form-panel,
+  .resource-list-panel,
+  .dashboard-metric-card,
+  .workload-panel,
+  .dashboard-upcoming-panel,
+  .study-plan-controls,
+  .study-plan-summary,
+  .study-plan-panel,
+  .resource-card,
+  .study-plan-item {
+    border-color: #496157;
+  }
+
+  .form-field input,
+  .form-field select {
+    border-color: #496157;
   }
 }
 

@@ -24,6 +24,9 @@ export default function AppShell() {
 
   return (
     <div className="app-shell">
+      <a className="skip-link" href="#main-content">
+        Skip to main content
+      </a>
       <aside className="sidebar">
         <div className="brand-lockup">
           <span className="brand-mark" aria-hidden="true">
@@ -69,7 +72,7 @@ export default function AppShell() {
           <BackendStatus />
         </header>
 
-        <main className="main-content">
+        <main className="main-content" id="main-content" tabIndex="-1">
           <Outlet />
         </main>
       </div>

@@ -186,7 +186,11 @@ export default function ExamsPage() {
       <Notice type="success" message={successMessage} />
 
       <div className="resource-workspace resource-workspace-wide-form">
-        <section className="resource-form-panel" aria-labelledby="exam-form-title">
+        <section
+          className="resource-form-panel"
+          aria-labelledby="exam-form-title"
+          aria-busy={submitting}
+        >
           <div className="panel-heading">
             <p className="page-eyebrow">{editingId === null ? "Add new" : "Editing"}</p>
             <h2 id="exam-form-title">
@@ -361,6 +365,7 @@ export default function ExamsPage() {
                       className="button button-secondary button-small"
                       type="button"
                       onClick={() => startEditing(exam)}
+                      aria-label={`Edit exam ${exam.name}`}
                     >
                       Edit
                     </button>
@@ -369,6 +374,7 @@ export default function ExamsPage() {
                       type="button"
                       onClick={() => handleDelete(exam)}
                       disabled={deletingId === exam.id}
+                      aria-label={`Delete exam ${exam.name}`}
                     >
                       {deletingId === exam.id ? "Deleting…" : "Delete"}
                     </button>

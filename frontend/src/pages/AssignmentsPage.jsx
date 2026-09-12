@@ -196,7 +196,11 @@ export default function AssignmentsPage() {
       <Notice type="success" message={successMessage} />
 
       <div className="resource-workspace resource-workspace-wide-form">
-        <section className="resource-form-panel" aria-labelledby="assignment-form-title">
+        <section
+          className="resource-form-panel"
+          aria-labelledby="assignment-form-title"
+          aria-busy={submitting}
+        >
           <div className="panel-heading">
             <p className="page-eyebrow">{editingId === null ? "Add new" : "Editing"}</p>
             <h2 id="assignment-form-title">
@@ -398,6 +402,7 @@ export default function AssignmentsPage() {
                       className="button button-secondary button-small"
                       type="button"
                       onClick={() => startEditing(assignment)}
+                      aria-label={`Edit assignment ${assignment.name}`}
                     >
                       Edit
                     </button>
@@ -406,6 +411,7 @@ export default function AssignmentsPage() {
                       type="button"
                       onClick={() => handleDelete(assignment)}
                       disabled={deletingId === assignment.id}
+                      aria-label={`Delete assignment ${assignment.name}`}
                     >
                       {deletingId === assignment.id ? "Deleting…" : "Delete"}
                     </button>

@@ -61,16 +61,19 @@ function UpcomingList({ type, records }) {
                   <div className="dashboard-upcoming-labels">
                     <span
                       className={`deadline-status deadline-status-${record.deadline_status.toLowerCase().replaceAll(" ", "-")}`}
+                      aria-label={`Deadline status: ${record.deadline_status}`}
                     >
                       {record.deadline_status}
                     </span>
                     <span
                       className={`priority-badge priority-${record.priority.toLowerCase()}`}
+                      aria-label={`Priority: ${record.priority}`}
                     >
                       {record.priority}
                     </span>
                     <span
                       className={`difficulty difficulty-${record.difficulty.toLowerCase()}`}
+                      aria-label={`Difficulty: ${record.difficulty}`}
                     >
                       {record.difficulty}
                     </span>
@@ -199,7 +202,11 @@ export default function DashboardPage() {
               </p>
             </div>
 
-            <form className="work-hours-form" onSubmit={handleWorkHoursSubmit}>
+            <form
+              className="work-hours-form"
+              onSubmit={handleWorkHoursSubmit}
+              aria-busy={loading}
+            >
               <label className="form-field">
                 <span>Work hours this week</span>
                 <input

@@ -105,7 +105,7 @@ export default function StudyPlanPage() {
           <p className="page-eyebrow">Plan settings</p>
           <h2 id="study-plan-controls-title">Make time for what matters</h2>
         </div>
-        <form className="study-plan-form" onSubmit={handleSubmit}>
+        <form className="study-plan-form" onSubmit={handleSubmit} aria-busy={loading}>
           <label className="form-field">
             <span>Available study hours</span>
             <input
@@ -184,7 +184,7 @@ export default function StudyPlanPage() {
                 message="There are no incomplete assignments or exams in this plan window."
               />
             ) : (
-              <ol className="study-plan-list">
+              <ol className="study-plan-list" aria-live="polite" aria-busy={loading}>
                 {plan.recommendations.map((recommendation, index) => (
                   <li className="study-plan-item" key={`${recommendation.type}-${recommendation.id}`}>
                     <div className="study-plan-order" aria-label={`Recommendation ${index + 1}`}>
@@ -200,6 +200,7 @@ export default function StudyPlanPage() {
                         </div>
                         <span
                           className={`plan-item-type plan-item-type-${recommendation.type.toLowerCase()}`}
+                          aria-label={`Item type: ${recommendation.type}`}
                         >
                           {recommendation.type}
                         </span>

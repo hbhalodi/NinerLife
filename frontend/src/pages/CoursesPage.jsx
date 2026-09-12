@@ -145,7 +145,11 @@ export default function CoursesPage() {
       <Notice type="success" message={successMessage} />
 
       <div className="resource-workspace">
-        <section className="resource-form-panel" aria-labelledby="course-form-title">
+        <section
+          className="resource-form-panel"
+          aria-labelledby="course-form-title"
+          aria-busy={submitting}
+        >
           <div className="panel-heading">
             <p className="page-eyebrow">{editingId === null ? "Add new" : "Editing"}</p>
             <h2 id="course-form-title">
@@ -231,6 +235,7 @@ export default function CoursesPage() {
                       className="button button-secondary button-small"
                       type="button"
                       onClick={() => startEditing(course)}
+                      aria-label={`Edit ${course.code} — ${course.name}`}
                     >
                       Edit
                     </button>
@@ -239,6 +244,7 @@ export default function CoursesPage() {
                       type="button"
                       onClick={() => handleDelete(course)}
                       disabled={deletingId === course.id}
+                      aria-label={`Delete ${course.code} — ${course.name}`}
                     >
                       {deletingId === course.id ? "Deleting…" : "Delete"}
                     </button>

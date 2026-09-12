@@ -1,7 +1,11 @@
 const configuredApiUrl = import.meta.env.VITE_API_URL || "http://localhost:8000";
 const apiBaseUrl = configuredApiUrl.replace(/\/$/, "");
 
-function formatApiDetail(detail) {
+function formatApiDetail(detail, status) {
+  if (status >= 500) {
+    return "The server could not complete the request. Please try again shortly.";
+  }
+
   if (typeof detail === "string") {
     return detail;
   }
@@ -48,7 +52,11 @@ export async function apiRequest(
     }
 
     const detail = responseBody?.detail;
-    throw new ApiError(formatApiDetail(detail), response.status, detail);
+    throw new ApiError(
+      formatApiDetail(detail, response.status),
+      response.status,
+      detail,
+    );
   }
 
   if (response.status === 204) {

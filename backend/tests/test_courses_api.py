@@ -7,11 +7,12 @@ from pathlib import Path
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session, sessionmaker
 
 from backend.app.database import create_database_tables, get_db
 from backend.app.main import app
-from backend.app.models import Assignment, Course
+from backend.app.models import Assignment, Course, Exam
 
 SessionFactory = sessionmaker[Session]
 ApiTestContext = tuple[TestClient, SessionFactory]
@@ -251,3 +252,155 @@ def test_delete_course_with_assignments_is_blocked(
     with session_factory() as database_session:
         assert database_session.get(Course, course_id) is not None
         assert database_session.get(Assignment, 1) is not None
+
+
+def test_delete_course_with_exams_is_blocked(
+    course_api_context: ApiTestContext,
+) -> None:
+    """Default DELETE should protect every Exam linked to a Course."""
+    client, session_factory = course_api_context
+    created_course = create_course(client)
+    course_id = int(created_course["id"])
+    with session_factory.begin() as database_session:
+        exam = Exam(
+            name="Protected Exam",
+            course_id=course_id,
+            exam_date=date(2026, 10, 15),
+            difficulty="Medium",
+            estimated_study_hours=4.0,
+            completed=False,
+        )
+        database_session.add(exam)
+
+    response = client.delete(f"/courses/{course_id}")
+
+    assert response.status_code == 409
+    assert response.json() == {
+        "detail": (
+            f"Course with id {course_id} cannot be deleted while it has "
+            "Exams. Remove or reassign them first."
+        )
+    }
+    with session_factory() as database_session:
+        assert database_session.get(Course, course_id) is not None
+        assert database_session.get(Exam, 1) is not None
+
+
+def test_cascade_delete_course_removes_only_its_linked_work(
+    course_api_context: ApiTestContext,
+) -> None:
+    """The explicit flag should remove one Course and its linked records together."""
+    client, session_factory = course_api_context
+    target_course = create_course(client, name="Target Course", code="TARGET 101")
+    unrelated_course = create_course(
+        client,
+        name="Unrelated Course",
+        code="OTHER 101",
+    )
+    target_course_id = int(target_course["id"])
+    unrelated_course_id = int(unrelated_course["id"])
+
+    with session_factory.begin() as database_session:
+        target_assignment = Assignment(
+            name="Target Assignment",
+            course_id=target_course_id,
+            due=date(2026, 10, 1),
+            difficulty="High",
+            estimated_hours=3.0,
+            completed=False,
+        )
+        target_exam = Exam(
+            name="Target Exam",
+            course_id=target_course_id,
+            exam_date=date(2026, 10, 15),
+            difficulty="Medium",
+            estimated_study_hours=4.0,
+            completed=False,
+        )
+        unrelated_assignment = Assignment(
+            name="Unrelated Assignment",
+            course_id=unrelated_course_id,
+            due=date(2026, 10, 2),
+            difficulty="Low",
+            estimated_hours=1.0,
+            completed=False,
+        )
+        unrelated_exam = Exam(
+            name="Unrelated Exam",
+            course_id=unrelated_course_id,
+            exam_date=date(2026, 10, 16),
+            difficulty="Low",
+            estimated_study_hours=2.0,
+            completed=False,
+        )
+        database_session.add_all(
+            [
+                target_assignment,
+                target_exam,
+                unrelated_assignment,
+                unrelated_exam,
+            ]
+        )
+        database_session.flush()
+        target_assignment_id = target_assignment.id
+        target_exam_id = target_exam.id
+        unrelated_assignment_id = unrelated_assignment.id
+        unrelated_exam_id = unrelated_exam.id
+
+    response = client.delete(f"/courses/{target_course_id}?delete_related=true")
+
+    assert response.status_code == 204
+    with session_factory() as database_session:
+        assert database_session.get(Course, target_course_id) is None
+        assert database_session.get(Assignment, target_assignment_id) is None
+        assert database_session.get(Exam, target_exam_id) is None
+        assert database_session.get(Course, unrelated_course_id) is not None
+        assert database_session.get(Assignment, unrelated_assignment_id) is not None
+        assert database_session.get(Exam, unrelated_exam_id) is not None
+
+
+def test_cascade_delete_rolls_back_when_commit_fails(
+    course_api_context: ApiTestContext,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A failed cascade commit must leave the Course and linked work intact."""
+    client, session_factory = course_api_context
+    created_course = create_course(client)
+    course_id = int(created_course["id"])
+    with session_factory.begin() as database_session:
+        assignment = Assignment(
+            name="Rollback Assignment",
+            course_id=course_id,
+            due=date(2026, 10, 3),
+            difficulty="High",
+            estimated_hours=2.0,
+            completed=False,
+        )
+        exam = Exam(
+            name="Rollback Exam",
+            course_id=course_id,
+            exam_date=date(2026, 10, 17),
+            difficulty="Medium",
+            estimated_study_hours=3.0,
+            completed=False,
+        )
+        database_session.add_all([assignment, exam])
+        database_session.flush()
+        assignment_id = assignment.id
+        exam_id = exam.id
+
+    def fail_commit(_: Session) -> None:
+        raise SQLAlchemyError("simulated transaction failure")
+
+    monkeypatch.setattr(Session, "commit", fail_commit)
+
+    response = client.delete(f"/courses/{course_id}?delete_related=true")
+
+    assert response.status_code == 500
+    assert response.json() == {
+        "detail": "Course and linked work could not be deleted. No data was changed."
+    }
+    with session_factory() as database_session:
+        assert database_session.get(Course, course_id) is not None
+        assert database_session.get(Assignment, assignment_id) is not None
+        assert database_session.get(Exam, exam_id) is not None

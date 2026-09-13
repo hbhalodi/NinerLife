@@ -114,8 +114,29 @@ export default function CoursesPage() {
     setErrorMessage("");
     setSuccessMessage("");
 
+    let courseWasDeleted = false;
+
     try {
-      await deleteCourse(course.id);
+      try {
+        await deleteCourse(course.id);
+      } catch (error) {
+        if (error.status !== 409) {
+          throw error;
+        }
+
+        const deleteRelated = window.confirm(
+          "This course still has assignments or exams. Deleting it will also delete all linked work. This cannot be undone. Continue?",
+        );
+
+        if (!deleteRelated) {
+          setSuccessMessage("Course deletion was canceled. Linked work was kept.");
+          return;
+        }
+
+        await deleteCourse(course.id, true);
+      }
+
+      courseWasDeleted = true;
       if (editingId === course.id) {
         resetForm();
       }
@@ -123,7 +144,12 @@ export default function CoursesPage() {
       setSuccessMessage(`${course.code} was deleted.`);
     } catch (error) {
       setErrorMessage(
-        getErrorMessage(error, "The course could not be deleted right now."),
+        getErrorMessage(
+          error,
+          courseWasDeleted
+            ? "The course was deleted, but the list could not refresh."
+            : "The course could not be deleted right now.",
+        ),
       );
     } finally {
       setDeletingId(null);

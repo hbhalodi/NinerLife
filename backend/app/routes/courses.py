@@ -1,7 +1,8 @@
 """REST API routes for course management."""
 
 from fastapi import APIRouter, Depends, HTTPException, Response, status
-from sqlalchemy import select
+from sqlalchemy import delete, select
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from ..database import get_db
@@ -123,10 +124,29 @@ def update_course(
 )
 def delete_course(
     course_id: int,
+    delete_related: bool = False,
     database_session: Session = Depends(get_db),
 ) -> Response:
-    """Delete an empty Course while protecting linked academic work."""
+    """Delete a Course, requiring an explicit opt-in for linked academic work."""
     course = get_course_or_404(course_id, database_session)
+
+    if delete_related:
+        try:
+            database_session.execute(
+                delete(Assignment).where(Assignment.course_id == course.id)
+            )
+            database_session.execute(delete(Exam).where(Exam.course_id == course.id))
+            database_session.delete(course)
+            database_session.commit()
+        except SQLAlchemyError as error:
+            database_session.rollback()
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Course and linked work could not be deleted. No data was changed.",
+            ) from error
+
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
+
     linked_assignment_id = database_session.scalar(
         select(Assignment.id)
         .where(Assignment.course_id == course.id)

@@ -6,11 +6,28 @@ import { getErrorMessage } from "../services/api";
 import { getDashboardSummary } from "../services/dashboard";
 
 function formatDate(value) {
+  if (!value) {
+    return "Date unavailable";
+  }
+
+  const date = new Date(`${value}T00:00:00`);
+  if (Number.isNaN(date.getTime())) {
+    return "Date unavailable";
+  }
+
   return new Intl.DateTimeFormat("en-US", {
     month: "short",
     day: "numeric",
     year: "numeric",
-  }).format(new Date(`${value}T00:00:00`));
+  }).format(date);
+}
+
+function getBadgeClass(value, prefix) {
+  if (typeof value !== "string" || value.trim() === "") {
+    return null;
+  }
+
+  return `${prefix}-${value.toLowerCase().replaceAll(" ", "-")}`;
 }
 
 function MetricCard({ label, value, detail }) {
@@ -47,36 +64,49 @@ function UpcomingList({ type, records }) {
         <div className="dashboard-upcoming-list">
           {records.map((record) => {
             const dateValue = isAssignment ? record.due : record.exam_date;
+            const courseLabel = [record.course?.code, record.course?.name]
+              .filter(Boolean)
+              .join(" — ") || "Course unavailable";
+            const deadlineClass = getBadgeClass(
+              record.deadline_status,
+              "deadline-status",
+            );
+            const priorityClass = getBadgeClass(record.priority, "priority");
+            const difficultyClass = getBadgeClass(record.difficulty, "difficulty");
 
             return (
               <article className="dashboard-upcoming-item" key={record.id}>
                 <div>
-                  <p className="record-context">
-                    {record.course.code} — {record.course.name}
-                  </p>
+                  <p className="record-context">{courseLabel}</p>
                   <h3>{record.name}</h3>
                 </div>
                 <div className="dashboard-upcoming-meta">
                   <time dateTime={dateValue}>{formatDate(dateValue)}</time>
                   <div className="dashboard-upcoming-labels">
-                    <span
-                      className={`deadline-status deadline-status-${record.deadline_status.toLowerCase().replaceAll(" ", "-")}`}
-                      aria-label={`Deadline status: ${record.deadline_status}`}
-                    >
-                      {record.deadline_status}
-                    </span>
-                    <span
-                      className={`priority-badge priority-${record.priority.toLowerCase()}`}
-                      aria-label={`Priority: ${record.priority}`}
-                    >
-                      {record.priority}
-                    </span>
-                    <span
-                      className={`difficulty difficulty-${record.difficulty.toLowerCase()}`}
-                      aria-label={`Difficulty: ${record.difficulty}`}
-                    >
-                      {record.difficulty}
-                    </span>
+                    {isAssignment && deadlineClass && (
+                      <span
+                        className={`deadline-status ${deadlineClass}`}
+                        aria-label={`Deadline status: ${record.deadline_status}`}
+                      >
+                        {record.deadline_status}
+                      </span>
+                    )}
+                    {isAssignment && priorityClass && (
+                      <span
+                        className={`priority-badge ${priorityClass}`}
+                        aria-label={`Priority: ${record.priority}`}
+                      >
+                        {record.priority}
+                      </span>
+                    )}
+                    {difficultyClass && (
+                      <span
+                        className={`difficulty ${difficultyClass}`}
+                        aria-label={`Difficulty: ${record.difficulty}`}
+                      >
+                        {record.difficulty}
+                      </span>
+                    )}
                   </div>
                 </div>
               </article>

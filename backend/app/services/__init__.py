@@ -1,5 +1,11 @@
 """Business services for the NinerLife API."""
 
+from .assignment_history import (
+    ASSIGNMENT_HISTORY_RETENTION_DAYS,
+    apply_assignment_completion_state,
+    current_utc_datetime,
+    purge_expired_assignment_history,
+)
 from .prioritization import (
     build_assignment_insight,
     calculate_priority,
@@ -22,12 +28,15 @@ from .workload import (
 )
 
 __all__ = [
+    "ASSIGNMENT_HISTORY_RETENTION_DAYS",
+    "apply_assignment_completion_state",
     "build_assignment_insight",
     "build_dashboard_summary",
     "build_study_plan",
     "calculate_planner_score",
     "calculate_priority",
     "calculate_workload_score",
+    "current_utc_datetime",
     "days_until_due",
     "get_assignment_insights",
     "get_deadline_status",
@@ -36,4 +45,5 @@ __all__ = [
     "get_urgency_score",
     "get_workload_level",
     "normalize_difficulty",
+    "purge_expired_assignment_history",
 ]

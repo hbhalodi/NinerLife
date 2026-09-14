@@ -1085,6 +1085,39 @@ a {
   margin-top: 1rem;
 }
 
+.assignment-section + .assignment-section {
+  border-top: 1px solid #dbe4de;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+}
+
+.assignment-section-heading {
+  align-items: center;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+}
+
+.assignment-section-heading h3 {
+  color: #1b352a;
+  font-size: 1.15rem;
+  margin: 0.2rem 0 0;
+}
+
+.assignment-section-heading > span {
+  color: #486055;
+  font-size: 0.875rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.assignment-history-note {
+  color: #486055;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin: 0.65rem 0 0;
+}
+
 .resource-card {
   border: 1px solid #dbe4de;
   border-radius: 0.85rem;

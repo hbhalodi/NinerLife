@@ -29,6 +29,119 @@ function formatDate(value) {
   }).format(new Date(`${value}T00:00:00`));
 }
 
+function getPastAssignments(assignments) {
+  return assignments
+    .filter((assignment) => assignment.completed)
+    .sort(
+      (first, second) =>
+        second.due.localeCompare(first.due) || second.id - first.id,
+    );
+}
+
+function AssignmentCard({
+  assignment,
+  deleting,
+  completionPending,
+  onDelete,
+  onEdit,
+  onSetCompletion,
+}) {
+  const isCompleted = assignment.completed;
+
+  return (
+    <article className="resource-card record-card">
+      <div className="record-card-heading">
+        <div>
+          <p className="record-context">
+            {assignment.course.code} — {assignment.course.name}
+          </p>
+          <h3>{assignment.name}</h3>
+        </div>
+        <span className={`completion-badge ${isCompleted ? "is-complete" : ""}`}>
+          {isCompleted ? "Completed" : "Open"}
+        </span>
+      </div>
+
+      <dl className="record-details assignment-insight-details">
+        <div>
+          <dt>Due</dt>
+          <dd>{formatDate(assignment.due)}</dd>
+        </div>
+        <div>
+          <dt>Difficulty</dt>
+          <dd>
+            <span className={`difficulty difficulty-${assignment.difficulty.toLowerCase()}`}>
+              {assignment.difficulty}
+            </span>
+          </dd>
+        </div>
+        {!isCompleted && (
+          <>
+            <div>
+              <dt>Deadline</dt>
+              <dd>
+                <span
+                  className={`deadline-status deadline-status-${assignment.deadline_status.toLowerCase().replaceAll(" ", "-")}`}
+                >
+                  {assignment.deadline_status}
+                </span>
+              </dd>
+            </div>
+            <div>
+              <dt>Priority</dt>
+              <dd>
+                <span className={`priority-badge priority-${assignment.priority.toLowerCase()}`}>
+                  {assignment.priority}
+                </span>
+              </dd>
+            </div>
+          </>
+        )}
+        <div>
+          <dt>Estimate</dt>
+          <dd>{assignment.estimated_hours} hours</dd>
+        </div>
+      </dl>
+
+      <div className="record-actions">
+        <button
+          className="button button-secondary button-small"
+          type="button"
+          onClick={() => onSetCompletion(assignment, !isCompleted)}
+          disabled={completionPending}
+          aria-label={`${isCompleted ? "Reopen" : "Mark complete"}: ${assignment.name}`}
+        >
+          {completionPending
+            ? isCompleted
+              ? "Reopening…"
+              : "Completing…"
+            : isCompleted
+              ? "Reopen"
+              : "✓ Mark complete"}
+        </button>
+        <button
+          className="button button-secondary button-small"
+          type="button"
+          onClick={() => onEdit(assignment)}
+          disabled={completionPending}
+          aria-label={`Edit assignment ${assignment.name}`}
+        >
+          Edit
+        </button>
+        <button
+          className="button button-danger button-small"
+          type="button"
+          onClick={() => onDelete(assignment)}
+          disabled={deleting || completionPending}
+          aria-label={`Delete assignment ${assignment.name}`}
+        >
+          {deleting ? "Deleting…" : "Delete"}
+        </button>
+      </div>
+    </article>
+  );
+}
+
 export default function AssignmentsPage() {
   const [assignments, setAssignments] = useState([]);
   const [courses, setCourses] = useState([]);
@@ -37,6 +150,7 @@ export default function AssignmentsPage() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
+  const [completionId, setCompletionId] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
@@ -181,6 +295,48 @@ export default function AssignmentsPage() {
     }
   }
 
+  async function handleCompletionChange(assignment, completed) {
+    setCompletionId(assignment.id);
+    setErrorMessage("");
+    setSuccessMessage("");
+
+    try {
+      await updateAssignment(assignment.id, {
+        name: assignment.name,
+        course_id: assignment.course_id,
+        due: assignment.due,
+        difficulty: assignment.difficulty,
+        estimated_hours: assignment.estimated_hours,
+        completed,
+      });
+      if (editingId === assignment.id) {
+        setFormData((current) => ({ ...current, completed }));
+      }
+      await refreshData();
+      setSuccessMessage(
+        completed
+          ? `${assignment.name} was marked complete and moved to Past Assignments.`
+          : `${assignment.name} was reopened and moved to Current Assignments.`,
+      );
+    } catch (error) {
+      setErrorMessage(
+        getErrorMessage(
+          error,
+          completed
+            ? "The assignment could not be marked complete right now."
+            : "The assignment could not be reopened right now.",
+        ),
+      );
+    } finally {
+      setCompletionId(null);
+    }
+  }
+
+  const currentAssignments = assignments.filter(
+    (assignment) => !assignment.completed,
+  );
+  const pastAssignments = getPastAssignments(assignments);
+
   return (
     <section className="page-stack" aria-labelledby="assignments-title">
       <ResourceHeader
@@ -321,104 +477,90 @@ export default function AssignmentsPage() {
           </form>
         </section>
 
-        <section className="resource-list-panel" aria-labelledby="assignment-list-title">
+        <section
+          className="resource-list-panel"
+          aria-labelledby="assignment-list-title"
+          aria-busy={loading || completionId !== null}
+        >
           <div className="list-heading">
             <div>
               <p className="page-eyebrow">Coursework</p>
-              <h2 id="assignment-list-title">All assignments</h2>
+              <h2 id="assignment-list-title">Assignment history</h2>
             </div>
             <span>{assignments.length} total</span>
           </div>
 
           {loading ? (
             <LoadingState label="assignments" />
-          ) : assignments.length === 0 ? (
-            <EmptyState
-              mark="A"
-              title="No assignments yet"
-              message="Add your first assignment when you are ready to plan coursework."
-            />
           ) : (
-            <div className="resource-card-list">
-              {assignments.map((assignment) => (
-                <article className="resource-card record-card" key={assignment.id}>
-                  <div className="record-card-heading">
-                    <div>
-                      <p className="record-context">
-                        {assignment.course.code} — {assignment.course.name}
-                      </p>
-                      <h3>{assignment.name}</h3>
-                    </div>
-                    <span
-                      className={`completion-badge ${
-                        assignment.completed ? "is-complete" : ""
-                      }`}
-                    >
-                      {assignment.completed ? "Completed" : "Open"}
-                    </span>
+            <>
+              <section className="assignment-section" aria-labelledby="current-assignments-title">
+                <div className="assignment-section-heading">
+                  <div>
+                    <p className="page-eyebrow">Active work</p>
+                    <h3 id="current-assignments-title">Current Assignments</h3>
                   </div>
+                  <span>{currentAssignments.length} open</span>
+                </div>
 
-                  <dl className="record-details assignment-insight-details">
-                    <div>
-                      <dt>Due</dt>
-                      <dd>{formatDate(assignment.due)}</dd>
-                    </div>
-                    <div>
-                      <dt>Difficulty</dt>
-                      <dd>
-                        <span className={`difficulty difficulty-${assignment.difficulty.toLowerCase()}`}>
-                          {assignment.difficulty}
-                        </span>
-                      </dd>
-                    </div>
-                    <div>
-                      <dt>Deadline</dt>
-                      <dd>
-                        <span
-                          className={`deadline-status deadline-status-${assignment.deadline_status.toLowerCase().replaceAll(" ", "-")}`}
-                        >
-                          {assignment.deadline_status}
-                        </span>
-                      </dd>
-                    </div>
-                    <div>
-                      <dt>Priority</dt>
-                      <dd>
-                        <span
-                          className={`priority-badge priority-${assignment.priority.toLowerCase()}`}
-                        >
-                          {assignment.priority}
-                        </span>
-                      </dd>
-                    </div>
-                    <div>
-                      <dt>Estimate</dt>
-                      <dd>{assignment.estimated_hours} hours</dd>
-                    </div>
-                  </dl>
-
-                  <div className="record-actions">
-                    <button
-                      className="button button-secondary button-small"
-                      type="button"
-                      onClick={() => startEditing(assignment)}
-                      aria-label={`Edit assignment ${assignment.name}`}
-                    >
-                      Edit
-                    </button>
-                    <button
-                      className="button button-danger button-small"
-                      type="button"
-                      onClick={() => handleDelete(assignment)}
-                      disabled={deletingId === assignment.id}
-                      aria-label={`Delete assignment ${assignment.name}`}
-                    >
-                      {deletingId === assignment.id ? "Deleting…" : "Delete"}
-                    </button>
+                {currentAssignments.length === 0 ? (
+                  <EmptyState
+                    mark="A"
+                    title="No current assignments"
+                    message="Completed work will appear in Past Assignments."
+                  />
+                ) : (
+                  <div className="resource-card-list">
+                    {currentAssignments.map((assignment) => (
+                      <AssignmentCard
+                        assignment={assignment}
+                        completionPending={completionId !== null}
+                        deleting={deletingId === assignment.id}
+                        key={assignment.id}
+                        onDelete={handleDelete}
+                        onEdit={startEditing}
+                        onSetCompletion={handleCompletionChange}
+                      />
+                    ))}
                   </div>
-                </article>
-              ))}
-            </div>
+                )}
+              </section>
+
+              <section className="assignment-section" aria-labelledby="past-assignments-title">
+                <div className="assignment-section-heading">
+                  <div>
+                    <p className="page-eyebrow">History</p>
+                    <h3 id="past-assignments-title">Past Assignments</h3>
+                  </div>
+                  <span>{pastAssignments.length} completed</span>
+                </div>
+                <p className="assignment-history-note">
+                  Completed assignments stay in history for seven days and are excluded from workload and study-plan calculations.
+                </p>
+
+                {pastAssignments.length === 0 ? (
+                  <EmptyState
+                    mark="✓"
+                    title="No completed assignments"
+                    message="Mark an assignment complete to keep it here as history."
+                  />
+                ) : (
+                  <div className="resource-card-list">
+                    {pastAssignments.map((assignment) => (
+                      <AssignmentCard
+                        assignment={assignment}
+                        completionPending={completionId !== null}
+                        deleting={deletingId === assignment.id}
+                        key={assignment.id}
+                        onDelete={handleDelete}
+                        onEdit={startEditing}
+                        onSetCompletion={handleCompletionChange}
+                      />
+                    ))}
+                  </div>
+                )}
+              </section>
+            </>
           )}
         </section>
       </div>

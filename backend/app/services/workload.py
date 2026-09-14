@@ -12,6 +12,7 @@ from ..schemas.dashboard import (
     UpcomingExam,
 )
 from .prioritization import build_assignment_insight
+from .assignment_history import purge_expired_assignment_history
 
 WorkloadLevel = Literal["Low", "Medium", "High"]
 
@@ -46,6 +47,7 @@ def build_dashboard_summary(
     reference_date: date | None = None,
 ) -> DashboardSummary:
     """Build a read-only dashboard summary for an inclusive seven-day window."""
+    purge_expired_assignment_history(database_session)
     window_start = reference_date or date.today()
     window_end = window_start + timedelta(days=7)
 

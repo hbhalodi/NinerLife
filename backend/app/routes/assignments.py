@@ -12,13 +12,18 @@ from ..schemas import (
     AssignmentResponse,
     AssignmentUpdate,
 )
-from ..services import get_assignment_insights as build_assignment_insights
+from ..services import (
+    apply_assignment_completion_state,
+    get_assignment_insights as build_assignment_insights,
+    purge_expired_assignment_history,
+)
 
 router = APIRouter(prefix="/assignments", tags=["assignments"])
 
 
 def get_assignment_or_404(assignment_id: int, database_session: Session) -> Assignment:
     """Return an assignment or raise a clear not-found response."""
+    purge_expired_assignment_history(database_session)
     assignment = database_session.get(Assignment, assignment_id)
     if assignment is None:
         raise HTTPException(
@@ -50,6 +55,7 @@ def create_assignment(
     verify_course_exists(assignment_data.course_id, database_session)
 
     assignment = Assignment(**assignment_data.model_dump())
+    apply_assignment_completion_state(assignment, assignment_data.completed)
     database_session.add(assignment)
     database_session.commit()
     database_session.refresh(assignment)
@@ -61,6 +67,7 @@ def get_assignments(
     database_session: Session = Depends(get_db),
 ) -> list[Assignment]:
     """Return every assignment ordered by its database ID."""
+    purge_expired_assignment_history(database_session)
     assignments = database_session.scalars(
         select(Assignment).order_by(Assignment.id)
     ).all()
@@ -72,6 +79,7 @@ def get_assignment_insights(
     database_session: Session = Depends(get_db),
 ) -> list[AssignmentInsight]:
     """Return read-only deadline and priority insights for every assignment."""
+    purge_expired_assignment_history(database_session)
     try:
         return build_assignment_insights(database_session)
     except ValueError as error:
@@ -100,8 +108,9 @@ def update_assignment(
     assignment = get_assignment_or_404(assignment_id, database_session)
     verify_course_exists(assignment_data.course_id, database_session)
 
-    for field_name, value in assignment_data.model_dump().items():
+    for field_name, value in assignment_data.model_dump(exclude={"completed"}).items():
         setattr(assignment, field_name, value)
+    apply_assignment_completion_state(assignment, assignment_data.completed)
 
     database_session.commit()
     database_session.refresh(assignment)

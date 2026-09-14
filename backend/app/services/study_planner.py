@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session, joinedload
 from ..models import Assignment, Course, Exam
 from ..schemas.study_plan import StudyPlanRecommendation, StudyPlanSummary
 from .prioritization import days_until_due, normalize_difficulty
+from .assignment_history import purge_expired_assignment_history
 
 OVERDUE_URGENCY_SCORE = 60
 NEAR_URGENCY_SCORE = 50
@@ -155,6 +156,7 @@ def build_study_plan(
     if not 1 <= horizon_days <= 30:
         raise ValueError("horizon_days must be between 1 and 30.")
 
+    purge_expired_assignment_history(database_session)
     today = reference_date or date.today()
     horizon_end = today + timedelta(days=horizon_days)
     assignments = database_session.scalars(

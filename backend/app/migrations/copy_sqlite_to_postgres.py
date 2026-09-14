@@ -74,6 +74,7 @@ def assignment_key(assignment: Assignment, target_course_id: int) -> tuple[objec
         assignment.difficulty,
         assignment.estimated_hours,
         assignment.completed,
+        assignment.completed_at,
     )
 
 
@@ -94,7 +95,12 @@ def matching_assignment_count(
     key: tuple[object, ...],
 ) -> int:
     """Count target Assignments with the same copied data."""
-    name, course_id, due, difficulty, estimated_hours, completed = key
+    name, course_id, due, difficulty, estimated_hours, completed, completed_at = key
+    completion_timestamp_filter = (
+        Assignment.completed_at.is_(None)
+        if completed_at is None
+        else Assignment.completed_at == completed_at
+    )
     return len(
         database_session.scalars(
             select(Assignment.id).where(
@@ -104,6 +110,7 @@ def matching_assignment_count(
                 Assignment.difficulty == difficulty,
                 Assignment.estimated_hours == estimated_hours,
                 Assignment.completed.is_(completed),
+                completion_timestamp_filter,
             )
         ).all()
     )
@@ -204,6 +211,7 @@ def copy_sqlite_data(source_engine: Engine, target_engine: Engine) -> SQLiteCopy
                                 difficulty=source_assignment.difficulty,
                                 estimated_hours=source_assignment.estimated_hours,
                                 completed=source_assignment.completed,
+                                completed_at=source_assignment.completed_at,
                             )
                         )
                         assignments_created += 1

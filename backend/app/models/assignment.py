@@ -1,9 +1,9 @@
 """Assignment database model."""
 
-from datetime import date
+from datetime import date, datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import Boolean, Date, Float, ForeignKey, String
+from sqlalchemy import Boolean, Date, DateTime, Float, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from ..database import Base
@@ -28,5 +28,9 @@ class Assignment(Base):
     difficulty: Mapped[str] = mapped_column(String(20), nullable=False)
     estimated_hours: Mapped[float] = mapped_column(Float, nullable=False)
     completed: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    completed_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+        nullable=True,
+    )
 
     course: Mapped["Course"] = relationship(back_populates="assignments")
